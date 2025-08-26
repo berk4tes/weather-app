@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hava Durumu</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌤️ Hava Durumu</h1>
+
+            <form id="searchForm" class="search" autocomplete="off">
+                <div class="searchbox">
+                    <input id="cityInput" type="text" placeholder="Şehir adı (örn: İzmir)" required />
+                    <ul id="suggestList" class="suggestions"></ul>
+                </div>
+
+                <button type="submit">Ara</button>
+
+            </form>
+
+        <section id="resultSection" style="display:none;">
+
+            <h2>Sonuç</h2>
+            <div id="resultArea"></div>
+
+        </section>
+        
+    </div>
+
+  <script src="app.js"></script>
+
+
+</body>
+</html>

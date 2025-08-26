@@ -1,0 +1,98 @@
+
+:root{
+  --background:#0f1115; --panel:#161a22; --text:#e7eef9; --muted:#98a2b3;
+  --accent:#7c7cff; --border:#2a3040; --card:#1b2230;
+}
+
+
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:system-ui, Arial, sans-serif; background:var(--background); color:var(--text); }
+.container{ max-width:980px; margin:32px auto; padding:0 16px; }
+
+
+h1{ margin:0 0 16px; font-weight:800; display:flex; align-items:center; gap:10px; }
+
+
+.search{ 
+  display:flex; align-items:center; gap:12px;
+}
+
+
+.searchbox{
+  position:relative; 
+  flex:1;
+  min-width:0;
+}
+
+
+.search input{
+  width:100%;
+  height:44px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  outline:none;
+}
+
+
+.search button{
+  height:44px;
+  padding:0 16px;
+  border:0;
+  border-radius:10px;
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+
+.suggestions{
+  position:absolute; left:0; right:0; top:100%;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-top:0;
+  border-radius:0 0 10px 10px;
+  list-style:none; margin:0; padding:0;
+  max-height:240px; overflow:auto; z-index:10;
+  display:none;
+}
+
+
+.suggestions.show{ display:block; }
+.suggestions li{
+  padding:10px 12px; border-top:1px solid #202637; cursor:pointer;
+  display:flex; justify-content:space-between; gap:8px;
+}
+
+
+.suggestions li:hover{ background:#1b2230; }
+.suggestions li.active{ outline:1px dashed var(--accent); background:#1b2230; }
+.suggestions .meta{ color:var(--muted); font-size:12px; }
+
+
+#resultSection{ margin-top:16px; }
+.card{
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; padding:14px;
+}
+.muted{ color:var(--muted); font-size:14px; }
+
+
+h3{ margin:12px 0 8px; font-size:16px; color:var(--text); }
+.dgrid{ display:grid; gap:8px; grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); }
+.ditem{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:6px; }
+.d-day{ font-weight:700; }
+.d-ico{ font-size:12px; color:var(--muted); }
+.d-temp{ font-size:14px; }
+.d-temp span{ color:var(--muted); }
+.d-rain{ font-size:12px; color:var(--muted); }
+
+
+@media (max-width:560px){
+  .search{ gap:8px; }
+  .search button{ padding:0 12px; }
+}
