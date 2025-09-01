@@ -3,6 +3,7 @@ const form = document.getElementById('searchForm');
 const input = document.getElementById('cityInput');
 const resultArea = document.getElementById('resultArea');
 const suggestList = document.getElementById('suggestList');
+let lastCity = null;
 
 
 function renderMessage(html) {
@@ -29,11 +30,11 @@ function wmoToDesc(code){
 function debounce(fn, delay){
   if (delay === undefined) delay = 300;
   let t;
-  return function(){
-    let args = arguments;
-    clearTimeout(t);
-    t = setTimeout(function(){ fn.apply(null, args); }, delay);
-  };
+    return function(){
+      let args = arguments;
+      clearTimeout(t);
+      t = setTimeout(function(){ fn.apply(null, args); }, delay);
+    };
 }
 
 
@@ -61,24 +62,25 @@ async function getCurrentWeather(lat, lon){
 
 
 function hideSuggestions(){ suggestList.classList.remove('show'); suggestList.innerHTML=''; }
+
 function showSuggestions(items){
   let html = "";
-for (let i = 0; i < items.length; i++) {
-  let g = items[i];
-  let name = g.name + (g.admin1 ? ", " + g.admin1 : "");
-  let meta = "";
-  if (g.country) meta += g.country;
-  if (g.timezone) {
-    if (meta) meta += " · ";
-    meta += g.timezone;
-  }
-  html += "<li data-lat='" + g.latitude + "' data-lon='" + g.longitude + "' data-name='" + name + "' data-country='" + (g.country||'') + "' data-tz='" + (g.timezone||'') + "'>" +
-            "<span>" + name + "</span>" +
-            "<span class='meta'>" + meta + "</span>" +
-          "</li>";
-}
-suggestList.innerHTML = html;
-suggestList.classList.add('show');
+    for (let i = 0; i < items.length; i++) {
+      let g = items[i];
+      let name = g.name + (g.admin1 ? ", " + g.admin1 : "");
+      let meta = "";
+      if (g.country) meta += g.country;
+      if (g.timezone) {
+        if (meta) meta += " · ";
+        meta += g.timezone;
+      }
+      html += "<li data-lat='" + g.latitude + "' data-lon='" + g.longitude + "' data-name='" + name + "' data-country='" + (g.country||'') + "' data-tz='" + (g.timezone||'') + "'>" +
+                "<span>" + name + "</span>" +
+                "<span class='meta'>" + meta + "</span>" +
+              "</li>";
+    }
+  suggestList.innerHTML = html;
+  suggestList.classList.add('show');
 
 }
 
@@ -104,7 +106,7 @@ let handleType = debounce(async function(){
 }, 300);
 
 
-suggestList.addEventListener('click', async (e)=>{
+  suggestList.addEventListener('click', async (e)=>{
   let li = e.target;
   while (li && li.tagName !== 'LI') {
     li = li.parentElement;
@@ -131,6 +133,8 @@ input.addEventListener('blur', ()=> setTimeout(hideSuggestions, 150));
 
 
 async function fetchAndRenderWeather(city){
+
+  lastCity = city; 
 
   document.getElementById('resultSection').style.display = 'block';
   renderMessage(
@@ -160,20 +164,28 @@ async function fetchAndRenderWeather(city){
 
 
     renderMessage(
-      "<div><b>" + city.name + "</b> — " + city.country + "</div>" +
-      "<div class='muted'>" + city.tz + "</div>" +
-      "<hr>" +
-      "<div>" + wmoToDesc(cur.weather_code) + "</div>" +
-      "<p class='muted'>" +
+        "<div><b>" + city.name + "</b> — " + city.country + "</div>" +
+        "<div class='muted'>" + city.tz + "</div>" +
+        "<hr>" +
+        "<div>" + wmoToDesc(cur.weather_code) + "</div>" +
+        "<p class='muted'>" +
         "🌡️ Sıcaklık: <b>" + c(cur.temperature_2m) + "</b><br>" +
         "🤏 Hissedilen: <b>" + c(cur.apparent_temperature) + "</b><br>" +
         "💧 Nem: <b>%" + cur.relative_humidity_2m + "</b><br>" +
         "💨 Rüzgar: <b>" + Math.round(cur.wind_speed_10m) + " km/sa</b><br>" +
         "⌛ Zaman: <b>" + niceTime + "</b> (" + dayText + ")" +
-      "</p>" +
-      "<h3>Önümüzdeki 7 Gün</h3>" +
-      dailyHtml
+        "</p>" +
+        "<button id='favAddBtn'>⭐ Favorilere Ekle</button>" +
+        "<h3>Önümüzdeki 7 Gün</h3>" +
+        dailyHtml
     );
+
+    let favBtn = document.getElementById("favAddBtn");
+    if (favBtn) {
+      favBtn.addEventListener("click", function(){
+        addFavorite(lastCity);
+      });
+    }
 
   }catch(err){
     renderMessage("<b>Hata:</b> " + err.message);
@@ -241,3 +253,97 @@ function renderDaily7(daily){
   return "<div class='dgrid'>" + html + "</div>";
 }
 
+
+function loadFavs(){
+  let raw = localStorage.getItem("favs");
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch(e){ return []; }
+}
+function saveFavs(arr){
+  localStorage.setItem("favs", JSON.stringify(arr));
+}
+
+function addFavorite(city){
+  if (!city) return;
+  let favs = loadFavs();
+
+
+  for (let i = 0; i < favs.length; i++){
+    if (Math.abs(favs[i].lat - city.lat) < 1e-6 && Math.abs(favs[i].lon - city.lon) < 1e-6){
+      alert("Bu şehir zaten favorilerde.");
+      return;
+    }
+  }
+
+  favs.push({
+    name: city.name,
+    country: city.country || "",
+    lat: city.lat, lon: city.lon,
+    tz: city.tz || ""
+  });
+  saveFavs(favs);
+  renderFavorites();
+}
+
+function removeFavorite(lat, lon){
+  let favs = loadFavs();
+  let out = [];
+  for (let i = 0; i < favs.length; i++){
+    let f = favs[i];
+    if (Math.abs(f.lat - lat) < 1e-6 && Math.abs(f.lon - lon) < 1e-6){
+
+    } else {
+      out.push(f);
+    }
+  }
+  saveFavs(out);
+  renderFavorites();
+}
+
+function renderFavorites(){
+  let ul = document.getElementById("favoritesList");
+  if (!ul) return;
+
+  let favs = loadFavs();
+  ul.innerHTML = "";
+
+  if (favs.length === 0){
+    let li = document.createElement("li");
+    li.textContent = "Henüz favori yok. Bir şehir seçip ⭐ ile ekle.";
+    ul.appendChild(li);
+    return;
+  }
+
+
+  for (let i = 0; i < favs.length; i++){
+    let f = favs[i];
+    let li = document.createElement("li");
+
+    let txt = document.createElement("span");
+    txt.textContent = f.name + (f.country ? " — " + f.country : "");
+
+    let showBtn = document.createElement("button");
+    showBtn.textContent = "Göster";
+    showBtn.addEventListener("click", function(){
+
+      fetchAndRenderWeather(f);
+    });
+
+    let delBtn = document.createElement("button");
+    delBtn.textContent = "Kaldır";
+    delBtn.addEventListener("click", function(){
+      removeFavorite(f.lat, f.lon);
+    });
+
+    li.appendChild(txt);
+    li.appendChild(document.createTextNode(" "));
+    li.appendChild(showBtn);
+    li.appendChild(document.createTextNode(" "));
+    li.appendChild(delBtn);
+    ul.appendChild(li);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  renderFavorites();
+});
