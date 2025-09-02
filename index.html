@@ -1,46 +1,40 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hava Durumu</title>
+
   <link rel="stylesheet" href="style.css"/>
 </head>
-
 <body>
-    <div class="container">
-        <h1>🌤️ Hava Durumu</h1>
+  <div class="container">
+    <h1>🌤️ Hava Durumu</h1>
 
-            <form id="searchForm" class="search" autocomplete="off">
-                <div class="searchbox">
-                    <input id="cityInput" type="text" placeholder="Şehir adı (örn: İzmir)" required />
-                    <ul id="suggestList" class="suggestions"></ul>
-                </div>
-
-                <button type="submit">Ara</button>
-
-            </form>
-
-            <section id="favoritesSection">
-                <h2>⭐ Favoriler</h2>
-                <ul id="favoritesList"></ul>
-            </section>
+    <form id="searchForm" class="search" autocomplete="off">
+      <div class="searchbox">
+        <input id="cityInput" type="text" placeholder="Şehir adı (örn: İzmir)" required />
+        <ul id="suggestList" class="suggestions"></ul>
+      </div>
+      <button type="submit">Ara</button>
+    </form>
 
 
+    <div class="app">
+      <aside id="favoritesSection" class="sidebar">
+        <h2>⭐ Favoriler</h2>
+        <ul id="favoritesList" class="favlist"></ul>
+        <p class="muted small-note">En fazla 10 favori ekleyebilirsin.</p>
+      </aside>
 
-
-        <section id="resultSection" style="display:none;">
-
-            <h2>Sonuç</h2>
-            <div id="resultArea"></div>
-
-        </section>
-        
+      <main id="resultSection" class="main" style="display:none;">
+        <h2>Sonuç</h2>
+        <div id="resultArea"></div>
+      </main>
     </div>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
-
-
 </body>
 </html>
